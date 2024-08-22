@@ -1,0 +1,37 @@
+{
+  "name": "sssa-js",
+  "version": "0.0.1",
+  "description": "Helper cryptography module for JavaScript",
+  "main": "sssa.js",
+  "scripts": {
+    "test": "node ./test/sssa.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SSSaaS/sssa-js.git"
+  },
+  "keywords": [
+    "javascript",
+    "sssa",
+    "shamir",
+    "secret",
+    "sharing",
+    "crypto"
+  ],
+  "author": "Alexander Scheel",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SSSaaS/sssa-js/issues"
+  },
+  "homepage": "https://github.com/SSSaaS/sssa-js#readme",
+  "devDependencies": {
+    "browserify": "^12.0.1",
+    "uglify-js": "^2.6.0"
+  },
+  "dependencies": {
+    "big-integer": "^1.6.5",
+    "get-random-values": "^1.1.1",
+    "global": "^4.3.0",
+    "utf-8": "^1.0.0"
+  }
+}

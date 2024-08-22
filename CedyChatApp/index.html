@@ -1,0 +1,137 @@
+<!-- index.html (Project 2) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cedy App (Port 3000)</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #222; /* Dark mode background color */
+      color: white; /* Default text color */
+    }
+    .chat-box {
+      margin: 0 auto; /* Centering the chat box */
+      max-width: 400px; /* Adjust the max width of the chat box */
+    }
+    .bubble {
+      padding: 10px 15px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+      max-width: 70%; /* Adjust the max width of the bubble */
+      word-wrap: break-word;
+    }
+    .sent-bubble {
+      background-color: #007bff; /* Blue bubble background color */
+      color: white; /* Text color inside the bubble */
+      align-self: flex-end;
+    }
+    .received-bubble {
+      background-color: #800080; /* Purple bubble background color */
+      color: white; /* Text color inside the bubble */
+      align-self: flex-start;
+    }
+    .message-container {
+      margin-bottom: 15px;
+    }
+    .encrypted-text {
+      font-size: 12px;
+      color: #ccc; /* Light color for encrypted message */
+    }
+    .decrypted-text {
+      font-size: 14px;
+      color: white; /* Main color for decrypted message */
+    }
+  </style>
+</head>
+<body>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8 chat-box">
+        <ul id="message-list" class="list-unstyled"></ul>
+        <div class="input-group mb-3">
+          <input id="message-input" type="text" class="form-control" placeholder="Message">
+          <button id="send-button" class="btn btn-primary" type="button">Send</button>
+          <input type="file" id="image-input" accept="image/*" style="display: none;">
+          <button id="send-image-button" class="btn btn-secondary" type="button">Send Image</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  
+  <script src="visualCrypto.js" defer></script>
+  <script>
+    const socket = io('http://localhost:4000');
+    const local_socket = io('http://localhost:3000');
+
+    const messageList = document.getElementById('message-list');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    const imageInput = document.getElementById('image-input');
+    const sendImageButton = document.getElementById('send-image-button');
+
+    // AES encryption and decryption functions
+    const key = "z^~K1[NT8g?0";
+
+    function encryptMessage(message) {
+      return CryptoJS.AES.encrypt(message, key).toString();
+    }
+
+    function decryptMessage(encryptedMessage) {
+      const bytes = CryptoJS.AES.decrypt(encryptedMessage, key);
+      return bytes.toString(CryptoJS.enc.Utf8);
+    }
+
+    sendButton.addEventListener('click', () => {
+      message = messageInput.value.trim();
+      if (message !== '') {
+        message = 'cedy: '+message;
+        // Encrypt the message before sending
+        const encryptedMessage = encryptMessage(message);
+        appendMessage({ decrypted: message, encrypted: encryptedMessage }, 'sent');
+        // Send the encrypted message
+        socket.emit('message', { message: encryptedMessage });
+        // Clear input field
+        messageInput.value = '';
+      }
+    });
+
+    local_socket.on('received_message', (data) => {
+      // Decrypt the received message
+      const decryptedMessage = decryptMessage(data.message);
+      console.log("received encrypted ==> ",data.message);
+      console.log("received decrypted ==> ",decryptedMessage);
+      // Append the decrypted and encrypted message to the chat interface
+      appendMessage({ decrypted: decryptedMessage, encrypted: data.message }, 'received');
+    });
+
+    function appendMessage(data, type) {
+      const li = document.createElement('li');
+      li.className = `bubble ${type === 'sent' ? 'sent-bubble' : 'received-bubble'}`;
+
+      const messageContainer = document.createElement('div');
+      messageContainer.className = 'message-container';
+
+      // Decrypted message
+      const decryptedText = document.createElement('div');
+      decryptedText.className = 'decrypted-text';
+      decryptedText.textContent = data.decrypted;
+
+      // Encrypted message
+      const encryptedText = document.createElement('div');
+      encryptedText.className = 'encrypted-text';
+      encryptedText.textContent = `Encrypted: ${data.encrypted}`;
+
+      messageContainer.appendChild(decryptedText);
+      messageContainer.appendChild(encryptedText);
+      li.appendChild(messageContainer);
+
+      messageList.appendChild(li);
+    }
+  </script>
+</body>
+</html>

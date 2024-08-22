@@ -1,0 +1,24 @@
+{
+  "name": "bobchatapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "crypto-js": "^4.2.0",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "shamir": "^0.7.1",
+    "socket.io": "^4.7.5",
+    "sssa": "^0.4.1",
+    "sssa-js": "^0.0.1"
+  }
+}
